@@ -3,6 +3,12 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 
 
+
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ast.CompilationUnit;
+
+
+
 public class UMLParser {
 
 	private static String fileLocation = null;
@@ -25,6 +31,8 @@ public class UMLParser {
 			for(File javaFile : location.listFiles(javaFiles)){
 				FileInputStream inputStream = new FileInputStream(javaFile.getAbsolutePath());
 				//Import javaparser and pass input stream to javaparser library
+				CompilationUnit unit = JavaParser.parse(inputStream);
+				
 				
 			}
 			
