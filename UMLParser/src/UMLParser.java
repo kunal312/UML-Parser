@@ -28,7 +28,7 @@ public class UMLParser {
 		File location = new File(fileLocation);
 		try{
 			
-			for(File javaFile : location.listFiles(javaFiles)){
+			for(File javaFile : location.listFiles(java_Files)){
 				FileInputStream inputStream = new FileInputStream(javaFile.getAbsolutePath());
 				//Import javaparser and pass input stream to javaparser library
 				CompilationUnit unit = JavaParser.parse(inputStream);
@@ -44,7 +44,7 @@ public class UMLParser {
 		}
 	}
 	
-	FileFilter javaFiles = new FileFilter() {
+	FileFilter java_Files = new FileFilter() {
 		public boolean accept(File file) {
 			if (file.isDirectory()) {
 				return true; 
