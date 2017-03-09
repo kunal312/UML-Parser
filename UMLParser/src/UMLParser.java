@@ -115,7 +115,7 @@ public class UMLParser {
 
 								}
 
-								// objclass//push to Main Array
+								// object class//push to Main Array
 
 							}
 						}
