@@ -144,4 +144,30 @@ public class UMLParser {
 	};
 	
 	
+	//Saving Image
+public static void saveImage() throws IOException {
+		
+		
+		URL url = new URL(imageUrl);
+		URLConnection urlConnection = url.openConnection();
+
+		// creating the input stream from google image
+		BufferedInputStream in = new BufferedInputStream(urlConnection.getInputStream());
+		// my local file writer, output stream
+		BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(destinationURL));
+
+		// until the end of data, keep saving into file.
+		int i;
+		while ((i = in.read()) != -1) {
+			out.write(i);
+		}
+		out.flush();
+
+		// closing all the shits
+		out.close();
+		in.close();
+
+	}
+	
+	
 }
