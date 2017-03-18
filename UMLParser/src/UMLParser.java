@@ -1,7 +1,14 @@
 import java.util.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
+
 import com.github.javaparser.ast.Node;
 
 
@@ -10,29 +17,32 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.omg.CORBA.portable.InputStream;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.body.TypeDeclaration;
-import com.github.javaparser.ast.body.BodyDeclaration;
-import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.body.ConstructorDeclaration;
-import com.github.javaparser.ast.body.FieldDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.Parameter;
-import com.github.javaparser.ast.body.TypeDeclaration;
-import com.github.javaparser.ast.body.VariableDeclarator;
-import com.github.javaparser.ast.type.PrimitiveType;
-import com.github.javaparser.ast.type.ReferenceType;
-import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.github.javaparser.*;
 
-import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+
+//import com.github.javaparser.ast.body.ConstructorDeclaration;
+//import com.github.javaparser.ast.body.FieldDeclaration;
+//import com.github.javaparser.ast.body.MethodDeclaration;
+//import com.github.javaparser.ast.body.Parameter;
+//import com.github.javaparser.ast.body.TypeDeclaration;
+//import com.github.javaparser.ast.body.VariableDeclarator;
+//import com.github.javaparser.ast.type.PrimitiveType;
+//import com.github.javaparser.ast.type.ReferenceType;
+//import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+//import com.github.javaparser.ast.body.TypeDeclaration;
+//import com.github.javaparser.ast.body.BodyDeclaration;
+//import com.github.javaparser.JavaParser;
+//import com.github.javaparser.ast.CompilationUnit;
 
 
 
 public class UMLParser {
 
 	private static String fileLocation = null;
+	public static String destination_URL = null;
+	public static String Url_image = null;
 	
 	public static void main(String[] args){
 		
@@ -51,10 +61,10 @@ public class UMLParser {
 			
 			for(File javaFile : location.listFiles(java_Files)){
 				FileInputStream inputStream = new FileInputStream(javaFile.getAbsolutePath());
-				//Import javaparser and pass input stream to javaparser library
+				//passing object to javaparser
 				 CompilationUnit unit = JavaParser.parse(inputStream);
-				    List<Node> cuChildNodes = unit.getChildNodes();
-					List<TypeDeclaration> listOfTypeDeclarations = unit.getTypes();
+				    List<Node> cuChildNodes = unit.getChildrenNodes();
+				    //List<TypeDeclaration> loTd = unit.getTypes();
 
 					JSONObject objintclass = new JSONObject();
 					
@@ -96,6 +106,7 @@ public class UMLParser {
 								objintclass.put("usesStruct", usesstruct);
 								objintclass.put("Association", association);
 
+								//Modifying the method
 								if (cid.getExtends() != null) {
 									for (Node Extends : cid.getExtends()) {
 
@@ -106,6 +117,8 @@ public class UMLParser {
 
 								}
 
+								
+								//Modifed the method
 								if (cid.getImplements() != null) {
 									for (Node Implements : cid.getImplements()) {
 										implement.put(Implements);
@@ -115,7 +128,7 @@ public class UMLParser {
 
 								}
 
-								// object class//push to Main Array
+								
 
 							}
 						}
@@ -148,22 +161,17 @@ public class UMLParser {
 public static void saveImage() throws IOException {
 		
 		
-		URL url = new URL(imageUrl);
+		URL url = new URL(Url_image);
 		URLConnection urlConnection = url.openConnection();
 
-		// creating the input stream from google image
 		BufferedInputStream in = new BufferedInputStream(urlConnection.getInputStream());
-		// my local file writer, output stream
-		BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(destinationURL));
-
-		// until the end of data, keep saving into file.
+		
+		BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(destination_URL));
 		int i;
 		while ((i = in.read()) != -1) {
 			out.write(i);
 		}
 		out.flush();
-
-		// closing all the shits
 		out.close();
 		in.close();
 
