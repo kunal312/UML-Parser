@@ -7,7 +7,7 @@ public class MakeUML {
 	
 	public Boolean makeUML(String parseString, String dst_Path){
 		
-		String base_yUML_API_Link="https://yuml.me/diagram/scruffy/class/";
+		String base_yUML_API_Link="https://yuml.me/diagram/plain/class/";
 		String complete_yUML_Link= base_yUML_API_Link+ parseString+ ".png";
 		System.out.println("Complete Link: "+complete_yUML_Link);
 		HttpURLConnection connection = null;
