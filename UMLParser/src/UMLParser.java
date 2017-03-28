@@ -11,7 +11,6 @@ import java.net.URLConnection;
 
 import com.github.javaparser.ast.Node;
 
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,20 +20,23 @@ import com.github.javaparser.*;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.TypeDeclaration;
 
-//import com.github.javaparser.ast.body.ConstructorDeclaration;
-//import com.github.javaparser.ast.body.FieldDeclaration;
-//import com.github.javaparser.ast.body.MethodDeclaration;
-//import com.github.javaparser.ast.body.Parameter;
-//import com.github.javaparser.ast.body.TypeDeclaration;
-//import com.github.javaparser.ast.body.VariableDeclarator;
-//import com.github.javaparser.ast.type.PrimitiveType;
-//import com.github.javaparser.ast.type.ReferenceType;
-//import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-//import com.github.javaparser.ast.body.TypeDeclaration;
-//import com.github.javaparser.ast.body.BodyDeclaration;
-//import com.github.javaparser.JavaParser;
-//import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
+import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.type.PrimitiveType;
+import com.github.javaparser.ast.type.ReferenceType;
+import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.body.BodyDeclaration;
+import com.github.javaparser.JavaParser;
+
+
+
 
 
 
@@ -47,7 +49,9 @@ public class UMLParser {
 	public static void main(String[] args){
 		
 		fileLocation = args[0];
+		destination_URL = args[1];
 		System.out.println("Command 1 Java File Location: "+fileLocation);
+		System.out.println("Command 2 Dest UrL: "+fileLocation);
 		UMLParser parser = new UMLParser();
 		parser.parseFile();
 		
@@ -63,15 +67,15 @@ public class UMLParser {
 				FileInputStream inputStream = new FileInputStream(javaFile.getAbsolutePath());
 				//passing object to javaparser
 				 CompilationUnit unit = JavaParser.parse(inputStream);
-				    List<Node> cuChildNodes = unit.getChildrenNodes();
-				    //List<TypeDeclaration> loTd = unit.getTypes();
+				    List<Node> child_Nodes = unit.getChildrenNodes();
+				    List<TypeDeclaration> loTd = unit.getTypes();
 
 					JSONObject objintclass = new JSONObject();
 					
-					for (Node cuChildNode : cuChildNodes) {
+					for (Node child : child_Nodes) {
 
-						if (cuChildNode instanceof ClassOrInterfaceDeclaration) {
-							ClassOrInterfaceDeclaration cid = (ClassOrInterfaceDeclaration) cuChildNode;
+						if (child instanceof ClassOrInterfaceDeclaration) {
+							ClassOrInterfaceDeclaration cid = child_Nodes;
 
 							JSONArray method = new JSONArray();
 							JSONArray extend = new JSONArray();
