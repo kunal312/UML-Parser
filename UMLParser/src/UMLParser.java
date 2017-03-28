@@ -38,8 +38,6 @@ import com.github.javaparser.JavaParser;
 
 
 
-
-
 public class UMLParser {
 
 	private static String fileLocation = null;

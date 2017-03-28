@@ -4,10 +4,12 @@ import java.net.*;
 
 public class MakeUML {
 	
-	public Boolean makeUML(String parseString, String dst_Path){
 	
+	public Boolean makeUML(String parseString, String dst_Path){
+		
 		String base_yUML_API_Link="https://yuml.me/diagram/scruffy/class/";
-		String complete_yUML_Link= base_yUML_API_Link+ parseString+".jpg";
+		String complete_yUML_Link= base_yUML_API_Link+ parseString+ ".png";
+		System.out.println("Complete Link: "+complete_yUML_Link);
 		HttpURLConnection connection = null;
 		//Creating HTTP Connection
 		try{
@@ -16,9 +18,9 @@ public class MakeUML {
 		//HTTP Request
 			 connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("GET");
-			connection.setRequestProperty("Accpet", "application/json");
-			connection.setUseCaches(false);
-			connection.setDoOutput(true);
+			connection.setRequestProperty("Accept", "application/json");
+			//connection.setUseCaches(false);
+			//connection.setDoOutput(true);
 			if(connection.getResponseCode()!=200){
 				throw new RuntimeException("Cannot Generate Diagram. Request Failed.Error Code:" + connection.getResponseCode());
 			}
@@ -36,6 +38,7 @@ public class MakeUML {
 			e.printStackTrace();
 			return null;
 		}finally{
+			
 			if(connection!=null){
 				connection.disconnect();
 			}
