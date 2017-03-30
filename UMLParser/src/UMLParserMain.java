@@ -10,12 +10,12 @@ public class UMLParserMain {
 		destination_URL = args[1];
 		
 		System.out.println("Command 1 Java File Location: "+fileLocation);
-		System.out.println("Command 2 Dest UrL: "+fileLocation);
+		System.out.println("Command 2 Dest UrL: "+destination_URL);
 		
 
 		//calling parse file with proper arguments
 		UMLParser parser = new UMLParser();
-		parser.parseFile(fileLocation);
+		parser.parseFile(fileLocation,destination_URL);
 		
 		
 		//Testing UML Class diagram generator with stubbed data.After completion of parsing file logic send grammar as an arguments to below function.
