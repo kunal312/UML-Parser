@@ -40,23 +40,8 @@ import com.github.javaparser.JavaParser;
 
 public class UMLParser {
 
-	private static String fileLocation = null;
-	public static String destination_URL = null;
-	public static String Url_image = null;
-	
-	public static void main(String[] args){
-		
-		fileLocation = args[0];
-		destination_URL = args[1];
-		System.out.println("Command 1 Java File Location: "+fileLocation);
-		System.out.println("Command 2 Dest UrL: "+fileLocation);
-		UMLParser parser = new UMLParser();
-		parser.parseFile();
-		
-	}
-	
-	
-	public void parseFile(){
+
+	public void parseFile(String fileLocation){
 		
 		File location = new File(fileLocation);
 		try{
@@ -139,13 +124,11 @@ public class UMLParser {
 				
 			}
 			
-			
-
-			
 		}catch(Exception e){
 			
 		}
 	}
+	
 	
 	FileFilter java_Files = new FileFilter() {
 		public boolean accept(File file) {
@@ -157,27 +140,5 @@ public class UMLParser {
 			return file.getName().endsWith(".java"); 
 		}
 	};
-	
-	
-	//Saving Image
-public static void saveImage() throws IOException {
-		
-		
-		URL url = new URL(Url_image);
-		URLConnection urlConnection = url.openConnection();
-
-		BufferedInputStream in = new BufferedInputStream(urlConnection.getInputStream());
-		
-		BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(destination_URL));
-		int i;
-		while ((i = in.read()) != -1) {
-			out.write(i);
-		}
-		out.flush();
-		out.close();
-		in.close();
-
-	}
-	
 	
 }
