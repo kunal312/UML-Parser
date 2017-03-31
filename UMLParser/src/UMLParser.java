@@ -42,7 +42,12 @@ public class UMLParser {
 
 	String fileLocation;
 	String destination_URL;
-	List<File> java_files = new ArrayList<File>();
+	List<File> java_files;
+	
+	public UMLParser(){
+		
+		java_files = new ArrayList<File>();
+	}
 	
 	public void parseFile(String fileLocation, String destination_URL){
 		
@@ -52,7 +57,6 @@ public class UMLParser {
 			
 
 	}
-	
 	
 	public void  getAllFilesWithJava(String fileLocation2) {
 		
