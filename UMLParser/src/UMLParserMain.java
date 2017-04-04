@@ -4,7 +4,7 @@ public class UMLParserMain {
 	private static String fileLocation = null;
 	public static String destination_URL = null;
 	
-	public static void main(String[] args){
+	public static void main(String[] args) throws Exception{
 		
 		fileLocation = args[0];
 		destination_URL = args[1];

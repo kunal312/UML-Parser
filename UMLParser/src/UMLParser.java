@@ -42,33 +42,59 @@ public class UMLParser {
 
 	String fileLocation;
 	String destination_URL;
-	List<File> java_files;
+	List<CompilationUnit> java_files;
+	HashSet<String> set_classes;
+	HashSet<String> set_interfaces;
 	
 	public UMLParser(){
 		
-		java_files = new ArrayList<File>();
+		java_files = new ArrayList<CompilationUnit>();
 	}
 	
-	public void parseFile(String fileLocation, String destination_URL){
+	public void parseFile(String fileLocation, String destination_URL) throws Exception{
 		
 		this.fileLocation = fileLocation;
 		this.destination_URL = destination_URL;
 		getAllFilesWithJava(fileLocation);
+		findClassorInterface(java_files);
+		
 			
 
 	}
 	
-	public void  getAllFilesWithJava(String fileLocation2) {
-		
-		File directory = new File(fileLocation2);
 
+    private void findClassorInterface(List<CompilationUnit> java_files) {
+    	
+    	set_interfaces = new HashSet<>();
+    	set_classes = new HashSet<>();
+    	
+    	for (CompilationUnit file : java_files) {
+    		//Creating List of "TypeDeclaration" to know if its class or interface
+    		List<TypeDeclaration> list_files = file.getTypes();
+        	if(!list_files.isEmpty() ){
+        		for(Node node : list_files)
+            	{
+            	 ClassOrInterfaceDeclaration classorinterface = (ClassOrInterfaceDeclaration)node;
+            	 if(classorinterface.isInterface())
+            		 set_interfaces.add(classorinterface.getName());
+            	 else
+            		 set_classes.add(classorinterface.getName());
+
+                }
+        	}
+        }
+    }
+	
+	private void  getAllFilesWithJava(String fileLocation2) throws Exception {
+		File directory = new File(fileLocation2);
 		for(File file : directory.listFiles()){
 			if(file.isFile() && file.getName().endsWith(".java")){
 				System.out.println("File " + file.getName());
-				java_files.add(file);
+	     //Using JavaParser.parse to generate Abstract Syntax Tree (AST) from Java code.AST structure is easy to process which returns CompilationUnit object
+				java_files.add(JavaParser.parse(file));
+			//	System.out.println(java_files.get(java_files.size()-1));
 			}
 		}
-		
 		System.out.println("Total number of files:"+java_files.size());
 	
 	}
