@@ -57,9 +57,6 @@ public class UMLParser {
 		this.destination_URL = destination_URL;
 		getAllFilesWithJava(fileLocation);
 		findClassorInterface(java_files);
-		
-			
-
 	}
 	
 
