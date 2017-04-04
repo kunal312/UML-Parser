@@ -89,7 +89,7 @@ public class UMLParser {
 				System.out.println("File " + file.getName());
 	     //Using JavaParser.parse to generate Abstract Syntax Tree (AST) from Java code.AST structure is easy to process which returns CompilationUnit object
 				java_files.add(JavaParser.parse(file));
-			//	System.out.println(java_files.get(java_files.size()-1));
+			//System.out.println(java_files.get(java_files.size()-1));
 			}
 		}
 		System.out.println("Total number of files:"+java_files.size());
