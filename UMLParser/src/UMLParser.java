@@ -42,15 +42,11 @@ public class UMLParser {
 
 	String fileLocation;
 	String destination_URL;
+
 	List<CompilationUnit> java_files;
 	HashSet<String> set_classes;
 	HashSet<String> set_interfaces;
-	
-	public UMLParser(){
-		
-		java_files = new ArrayList<CompilationUnit>();
-	}
-	
+
 	public void parseFile(String fileLocation, String destination_URL) throws Exception{
 		
 		this.fileLocation = fileLocation;
@@ -83,6 +79,7 @@ public class UMLParser {
     }
 	
 	private void  getAllFilesWithJava(String fileLocation2) throws Exception {
+		java_files = new ArrayList<>();
 		File directory = new File(fileLocation2);
 		for(File file : directory.listFiles()){
 			if(file.isFile() && file.getName().endsWith(".java")){
