@@ -15,7 +15,7 @@ public class UMLParserMain {
 
 		//calling parse file with proper arguments
 		UMLParser parser = new UMLParser();
-		parser.parseFile(fileLocation,destination_URL);
+		String grammar = parser.parseFile(fileLocation,destination_URL);
 		
 		
 		//Testing UML Class diagram generator with stubbed data.After completion of parsing file logic send grammar as an arguments to below function.
