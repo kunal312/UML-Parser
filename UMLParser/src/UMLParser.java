@@ -6,6 +6,7 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -54,14 +55,15 @@ public class UMLParser {
 		this.destination_URL = destination_URL;
 		getAllFilesWithJava(fileLocation);
 		findClassorInterface(java_files);
-		String heading = createGrammar(java_files);
-		return heading;
+		String completeGrammar = createGrammar(java_files);
+		return completeGrammar;
 	}
 	
 
 	private String createGrammar(List<CompilationUnit> java_files){
 		
 		String heading = "";
+		
 		
 		for(CompilationUnit file : java_files){
 			List<TypeDeclaration> listtypedec = file.getTypes();
@@ -80,12 +82,23 @@ public class UMLParser {
 			List<BodyDeclaration> members = ((TypeDeclaration)node).getMembers();
 			for(BodyDeclaration member : members){
 				System.out.println("Member: "+member);
+				if( member instanceof ConstructorDeclaration ){
+					ConstructorDeclaration member_constructor = ((ConstructorDeclaration)member);
+					System.out.println("Constructor: "+member_constructor );
+
+					if(((ConstructorDeclaration) member).getDeclarationAsString().startsWith("public") &&  !classorinterface.isInterface()){
+						System.out.println("Found Public Constructor");
+						
+					}
+					
+				}
 			}
 			
 		  
 			
 			
 	}
+		System.out.println("grammar:" +heading);
 		return heading;
 	}
 	

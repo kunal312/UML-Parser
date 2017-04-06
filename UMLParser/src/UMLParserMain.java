@@ -9,8 +9,8 @@ public class UMLParserMain {
 		fileLocation = args[0];
 		destination_URL = args[1];
 		
-		System.out.println("Command 1 Java File Location: "+fileLocation);
-		System.out.println("Command 2 Dest UrL: "+destination_URL);
+	//	System.out.println("Command 1 Java File Location: "+fileLocation);
+	//	System.out.println("Command 2 Dest UrL: "+destination_URL);
 		
 
 		//calling parse file with proper arguments
