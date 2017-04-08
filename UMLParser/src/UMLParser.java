@@ -88,7 +88,9 @@ public class UMLParser {
 
 					if(((ConstructorDeclaration) member).getDeclarationAsString().startsWith("public") &&  !classorinterface.isInterface()){
 						System.out.println("Found Public Constructor");
-						
+					}
+					else{
+						System.out.println("No Public Constructor");
 					}
 					
 				}
