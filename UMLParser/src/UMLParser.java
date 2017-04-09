@@ -107,19 +107,25 @@ public class UMLParser {
 										append += "[" + type + "]";
 								}
 								append += ",";
-
 							}
-
 						}
 						method_grammar += ")";
 					}
 				}
-
-
 			}
-			System.out.println("grammar:" + heading);
 
+			//If not constructor check if its method
+			for(BodyDeclaration member : ((ClassOrInterfaceDeclaration) node).getMembers()){
+				if(member instanceof  MethodDeclaration){
+					if(!classorinterface.isInterface() && ((MethodDeclaration) member).getDeclarationAsString().startsWith("public")){
+						if(((MethodDeclaration) member).getName().startsWith("get") || ((MethodDeclaration) member).getName().startsWith("set")){
+							//Make Filed public
+						}
+					}
+				}
+			}
 		}
+		System.out.println("grammar:" + heading);
 		return heading;
 	}
 	
