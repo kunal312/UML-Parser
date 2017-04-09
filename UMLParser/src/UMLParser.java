@@ -61,65 +61,67 @@ public class UMLParser {
 	}
 	
 
-	private String createGrammar(List<CompilationUnit> java_files){
-		
+	private String createGrammar(List<CompilationUnit> java_files) {
+
 		String heading = "";
-		
-		
-		for(CompilationUnit file : java_files){
+		String append = ",";
+
+
+		for (CompilationUnit file : java_files) {
 			List<TypeDeclaration> listtypedec = file.getTypes();
 			//System.out.println("list type dec: "+listtypedec);
 			//System.out.println("listsize: "+listtypedec.size());
 			Node node = listtypedec.get(0);
 			//System.out.println("Node:ltd: "+node);
-		ClassOrInterfaceDeclaration classorinterface = (ClassOrInterfaceDeclaration)node;
-		if(classorinterface.isInterface()){
-			heading = "[" + "<<interface>>;";
-		}
-		else
-			heading = "[";
-			heading += classorinterface.getName();	
-			//Parsing Methods
-			List<BodyDeclaration> members = ((TypeDeclaration)node).getMembers();
-			for(BodyDeclaration member : members){
-				System.out.println("Member: "+member);
-				if( member instanceof ConstructorDeclaration ){
-					ConstructorDeclaration member_constructor = ((ConstructorDeclaration)member);
-					System.out.println("Constructor: "+member_constructor );
+			ClassOrInterfaceDeclaration classorinterface = (ClassOrInterfaceDeclaration) node;
+			if (classorinterface.isInterface()) {
+				heading = "[" + "<<interface>>;";
+			} else
+				heading = "[";
 
-					if(!classorinterface.isInterface() && ((ConstructorDeclaration) member).getDeclarationAsString().startsWith("public") ){
+			heading += classorinterface.getName();
+			//Parsing Methods
+			List<BodyDeclaration> members = ((TypeDeclaration) node).getMembers();
+			for (BodyDeclaration member : members) {
+				System.out.println("Member: " + member);
+				if (member instanceof ConstructorDeclaration) {
+					ConstructorDeclaration member_constructor = ((ConstructorDeclaration) member);
+					System.out.println("Constructor: " + member_constructor);
+
+					if (!classorinterface.isInterface() && ((ConstructorDeclaration) member).getDeclarationAsString().startsWith("public")) {
 						System.out.println("Found Public Constructor");
-						method_grammar +=";";
+						method_grammar += ";";
 						method_grammar += "+ " + member_constructor.getName() + "(";
-						for(Object child_nodes : member_constructor.getChildrenNodes()){
+						for (Object child_nodes : member_constructor.getChildrenNodes()) {
 							System.out.println("Child_Nodes:" + child_nodes);
-							if(child_nodes instanceof  Parameter){
+							if (child_nodes instanceof Parameter) {
 								System.out.println("Found parameter in constructor");
 								String name = ((Parameter) child_nodes).getChildrenNodes().get(0).toString();
 								String type = ((Parameter) child_nodes).getType().toString();
-								method_grammar+=name+" : "+type;
+								method_grammar += name + " : " + type;
+								if (set_classes.contains(type)) {
+									append += "[" + heading + "] uses -.->";
+									if (set_interfaces.contains(type)) {
+										append += "[<<interface>>;" + type + "]";
+									} else
+										append += "[" + type + "]";
+								}
+								append += ",";
+
 							}
 
 						}
-
-
-
+						method_grammar += ")";
 					}
-					else{
-						System.out.println("No Public Constructor");
-					}
-					
 				}
+
+
 			}
-			
-		  
-			
-			
-	}
-		System.out.println("grammar:" +heading);
+			System.out.println("grammar:" + heading);
+
+		}
 		return heading;
 	}
-	
 	
     private void findClassorInterface(List<CompilationUnit> java_files) {
     	
