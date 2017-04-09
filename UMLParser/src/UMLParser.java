@@ -48,6 +48,7 @@ public class UMLParser {
 	HashSet<String> set_classes;
 	HashSet<String> set_interfaces;
 	String yUML_grammar ="";
+	String method_grammar="";
 	
 	public String parseFile(String fileLocation, String destination_URL) throws Exception{
 		
@@ -86,8 +87,20 @@ public class UMLParser {
 					ConstructorDeclaration member_constructor = ((ConstructorDeclaration)member);
 					System.out.println("Constructor: "+member_constructor );
 
-					if(((ConstructorDeclaration) member).getDeclarationAsString().startsWith("public") &&  !classorinterface.isInterface()){
+					if(!classorinterface.isInterface() && ((ConstructorDeclaration) member).getDeclarationAsString().startsWith("public") ){
 						System.out.println("Found Public Constructor");
+						method_grammar +=";";
+						method_grammar += "+ " + member_constructor.getName() + "(";
+						for(Object child_nodes : member_constructor.getChildrenNodes()){
+							System.out.println("Child_Nodes:" + child_nodes);
+							if(child_nodes instanceof  Parameter){
+								System.out.println("Found parameter in constructor");
+							}
+
+						}
+
+
+
 					}
 					else{
 						System.out.println("No Public Constructor");
