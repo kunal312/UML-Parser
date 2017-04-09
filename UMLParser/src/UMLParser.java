@@ -95,6 +95,9 @@ public class UMLParser {
 							System.out.println("Child_Nodes:" + child_nodes);
 							if(child_nodes instanceof  Parameter){
 								System.out.println("Found parameter in constructor");
+								String name = ((Parameter) child_nodes).getChildrenNodes().get(0).toString();
+								String type = ((Parameter) child_nodes).getType().toString();
+								method_grammar+=name+" : "+type;
 							}
 
 						}
