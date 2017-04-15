@@ -48,7 +48,7 @@ public class UMLParser {
 	HashSet<String> set_classes;
 	HashSet<String> set_interfaces;
 	String yUML_grammar ="";
-	String method_grammar="";
+
 	
 	public String parseFile(String fileLocation, String destination_URL) throws Exception{
 		
@@ -66,6 +66,7 @@ public class UMLParser {
 		String heading = "";
 		String append = ",";
 		String classOrInterfaceName="";
+		String method_grammar="";
 
 		for (CompilationUnit file : java_files) {
 			List<TypeDeclaration> listtypedec = file.getTypes();
