@@ -65,29 +65,30 @@ public class UMLParser {
 
 		String heading = "";
 		String append = ",";
-
+		String classOrInterfaceName="";
 
 		for (CompilationUnit file : java_files) {
 			List<TypeDeclaration> listtypedec = file.getTypes();
-			//System.out.println("list type dec: "+listtypedec);
-			//System.out.println("listsize: "+listtypedec.size());
 			Node node = listtypedec.get(0);
-			//System.out.println("Node:ltd: "+node);
+
 			ClassOrInterfaceDeclaration classorinterface = (ClassOrInterfaceDeclaration) node;
 			if (classorinterface.isInterface()) {
-				heading = "[" + "<<interface>>;";
+				classOrInterfaceName = "[" + "<<interface>>;";
 			} else
-				heading = "[";
+				classOrInterfaceName = "[";
 
-			heading += classorinterface.getName();
-			//Parsing Methods
+			classOrInterfaceName += classorinterface.getName();
+
+
+			//Parsing Methods,Constructors
+
 			List<BodyDeclaration> members = ((TypeDeclaration) node).getMembers();
 			for (BodyDeclaration member : members) {
-				System.out.println("Member: " + member);
+				//Checking if its constructor
 				if (member instanceof ConstructorDeclaration) {
+
 					ConstructorDeclaration member_constructor = ((ConstructorDeclaration) member);
 					System.out.println("Constructor: " + member_constructor);
-
 					if (!classorinterface.isInterface() && ((ConstructorDeclaration) member).getDeclarationAsString().startsWith("public")) {
 						System.out.println("Found Public Constructor");
 						method_grammar += ";";
