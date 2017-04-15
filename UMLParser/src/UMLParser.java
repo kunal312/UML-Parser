@@ -50,10 +50,12 @@ public class UMLParser {
 	String yUML_grammar ="";
 	String heading = "";
 	String append = ",";
+	String classOrInterfaceGrammar="";
 	String classOrInterfaceName="";
 	String method_grammar="";
 	ClassOrInterfaceDeclaration classorinterface;
 	List<String> publicFields = new ArrayList<String>();
+	boolean isMore = false;
 	
 	public String parseFile(String fileLocation, String destination_URL) throws Exception{
 		
@@ -74,14 +76,16 @@ public class UMLParser {
 
 			classorinterface = (ClassOrInterfaceDeclaration) node;
 			if (classorinterface.isInterface()) {
-				classOrInterfaceName = "[" + "<<interface>>;";
+				classOrInterfaceGrammar = "[" + "<<interface>>;";
 			} else
-				classOrInterfaceName = "[";
+				classOrInterfaceGrammar = "[";
 
-			classOrInterfaceName += classorinterface.getName();
+			classOrInterfaceGrammar += classorinterface.getName();
+			classOrInterfaceName = classorinterface.getName();
+
 			//Parsing Methods,Constructors
 			checkConstructor(node);
-			checkMethods(node);
+			//checkMethods(node);
 
 		}
 		System.out.println("grammar:" + heading);
@@ -101,6 +105,7 @@ public class UMLParser {
 
 				if (!classorinterface.isInterface() && isPublic(memberAsString)) {
 					System.out.println("Found Public Constructor");
+					if(isMore)
 					method_grammar += ";";
 					method_grammar += "+ " + member_constructor.getName() + "(";
 					for (Object child_nodes : member_constructor.getChildrenNodes()) {
@@ -108,7 +113,9 @@ public class UMLParser {
 						if (child_nodes instanceof Parameter) {
 							System.out.println("Found parameter in constructor");
 							String name = ((Parameter) child_nodes).getChildrenNodes().get(0).toString();
+							System.out.println("Name: "+name);
 							String type = ((Parameter) child_nodes).getType().toString();
+							System.out.println("type: "+type);
 							method_grammar += name + " : " + type;
 							if (set_classes.contains(type)) {
 								append += "[" + heading + "] uses -.->";
@@ -120,7 +127,10 @@ public class UMLParser {
 							append += ",";
 						}
 					}
+
 					method_grammar += ")";
+					isMore =true;
+					System.out.println("Method_grammar:"+method_grammar);
 				}
 			}
 		}
@@ -132,6 +142,7 @@ public class UMLParser {
 		// check if its method
 		for(BodyDeclaration member : ((ClassOrInterfaceDeclaration) node).getMembers()){
 			if(member instanceof  MethodDeclaration){
+				MethodDeclaration member_method = (MethodDeclaration)member;
 				String memberAsString = ((MethodDeclaration) member).getDeclarationAsString();
 				String memberName = ((MethodDeclaration) member).getName();
 
@@ -141,10 +152,44 @@ public class UMLParser {
 						//Make field public
 						publicFields.add(memberName.substring(3).toLowerCase());
 					}else{
-						
+						if(isMore)
+						method_grammar +=";";
+						method_grammar += "+" + memberName +"(";
+
+						for(Object child_nodes : member_method.getChildrenNodes()){
+							if (child_nodes instanceof Parameter) {
+								System.out.println("Found parameters in methods");
+								String name = ((Parameter) child_nodes).getChildrenNodes().get(0).toString();
+								String type = ((Parameter) child_nodes).getType().toString();
+								method_grammar += name + " : "+type;
+
+								if(set_classes.contains(type) && !set_interfaces.contains(classOrInterfaceName)){
+								append +="[" + classOrInterfaceName + "] uses -.->";
+									if(set_interfaces.contains(type))
+									append += "[<<interface>>;" + type + "]";
+									else
+										append += "[" +type+ "]";
+
+								}
+								append+=",";
+							}else{
+								String methods [] = child_nodes.toString().split(" ");
+								for(String method: methods){
+									if(set_classes.contains(method) && !set_interfaces.contains(classOrInterfaceName)){
+										append += "[" + classOrInterfaceName + "] uses -.->";
+										if(set_interfaces.contains(method))
+											append += "[<<interface>>;" + method + "]";
+										else
+											append += "[" +method+ "]";
+											append+=",";
+									}
+								}
+							}
+
+						}
+						method_grammar+= ") : "+member_method.getType();
+						isMore=true;
 					}
-
-
 				}
 			}
 		}
