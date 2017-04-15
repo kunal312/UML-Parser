@@ -48,6 +48,11 @@ public class UMLParser {
 	HashSet<String> set_classes;
 	HashSet<String> set_interfaces;
 	String yUML_grammar ="";
+	String heading = "";
+	String append = ",";
+	String classOrInterfaceName="";
+	String method_grammar="";
+	ClassOrInterfaceDeclaration classorinterface;
 
 	
 	public String parseFile(String fileLocation, String destination_URL) throws Exception{
@@ -63,76 +68,94 @@ public class UMLParser {
 
 	private String createGrammar(List<CompilationUnit> java_files) {
 
-		String heading = "";
-		String append = ",";
-		String classOrInterfaceName="";
-		String method_grammar="";
-
 		for (CompilationUnit file : java_files) {
 			List<TypeDeclaration> listtypedec = file.getTypes();
 			Node node = listtypedec.get(0);
 
-			ClassOrInterfaceDeclaration classorinterface = (ClassOrInterfaceDeclaration) node;
+			classorinterface = (ClassOrInterfaceDeclaration) node;
 			if (classorinterface.isInterface()) {
 				classOrInterfaceName = "[" + "<<interface>>;";
 			} else
 				classOrInterfaceName = "[";
 
 			classOrInterfaceName += classorinterface.getName();
-
-
 			//Parsing Methods,Constructors
+			checkConstructor(node);
+			checkMethods(node);
 
-			List<BodyDeclaration> members = ((TypeDeclaration) node).getMembers();
-			for (BodyDeclaration member : members) {
-				//Checking if its constructor
-				if (member instanceof ConstructorDeclaration) {
-
-					ConstructorDeclaration member_constructor = ((ConstructorDeclaration) member);
-					System.out.println("Constructor: " + member_constructor);
-					String memberAsString = ((ConstructorDeclaration) member).getDeclarationAsString();
-
-					if (!classorinterface.isInterface() && isPublic(memberAsString)) {
-						System.out.println("Found Public Constructor");
-						method_grammar += ";";
-						method_grammar += "+ " + member_constructor.getName() + "(";
-						for (Object child_nodes : member_constructor.getChildrenNodes()) {
-							System.out.println("Child_Nodes:" + child_nodes);
-							if (child_nodes instanceof Parameter) {
-								System.out.println("Found parameter in constructor");
-								String name = ((Parameter) child_nodes).getChildrenNodes().get(0).toString();
-								String type = ((Parameter) child_nodes).getType().toString();
-								method_grammar += name + " : " + type;
-								if (set_classes.contains(type)) {
-									append += "[" + heading + "] uses -.->";
-									if (set_interfaces.contains(type)) {
-										append += "[<<interface>>;" + type + "]";
-									} else
-										append += "[" + type + "]";
-								}
-								append += ",";
-							}
-						}
-						method_grammar += ")";
-					}
-				}
-			}
-
-			//If not constructor check if its method
-			for(BodyDeclaration member : ((ClassOrInterfaceDeclaration) node).getMembers()){
-				if(member instanceof  MethodDeclaration){
-					if(!classorinterface.isInterface() && ((MethodDeclaration) member).getDeclarationAsString().startsWith("public")){
-						if(((MethodDeclaration) member).getName().startsWith("get") || ((MethodDeclaration) member).getName().startsWith("set")){
-							//Make Filed public
-						}
-					}
-				}
-			}
 		}
 		System.out.println("grammar:" + heading);
 		return heading;
 	}
 
+
+	private void checkConstructor(Node node){
+		List<BodyDeclaration> members = ((TypeDeclaration) node).getMembers();
+		for (BodyDeclaration member : members) {
+			//Checking if its constructor
+			if (member instanceof ConstructorDeclaration) {
+
+				ConstructorDeclaration member_constructor = ((ConstructorDeclaration) member);
+				System.out.println("Constructor: " + member_constructor);
+				String memberAsString = ((ConstructorDeclaration) member).getDeclarationAsString();
+
+				if (!classorinterface.isInterface() && isPublic(memberAsString)) {
+					System.out.println("Found Public Constructor");
+					method_grammar += ";";
+					method_grammar += "+ " + member_constructor.getName() + "(";
+					for (Object child_nodes : member_constructor.getChildrenNodes()) {
+						System.out.println("Child_Nodes:" + child_nodes);
+						if (child_nodes instanceof Parameter) {
+							System.out.println("Found parameter in constructor");
+							String name = ((Parameter) child_nodes).getChildrenNodes().get(0).toString();
+							String type = ((Parameter) child_nodes).getType().toString();
+							method_grammar += name + " : " + type;
+							if (set_classes.contains(type)) {
+								append += "[" + heading + "] uses -.->";
+								if (set_interfaces.contains(type)) {
+									append += "[<<interface>>;" + type + "]";
+								} else
+									append += "[" + type + "]";
+							}
+							append += ",";
+						}
+					}
+					method_grammar += ")";
+				}
+			}
+		}
+
+	}
+
+	private void checkMethods(Node node){
+
+		// check if its method
+		for(BodyDeclaration member : ((ClassOrInterfaceDeclaration) node).getMembers()){
+			if(member instanceof  MethodDeclaration){
+				String memberAsString = ((MethodDeclaration) member).getDeclarationAsString();
+				String memberName = ((MethodDeclaration) member).getName();
+
+				if(!classorinterface.isInterface() && isPublic(memberAsString)){
+
+					if(isGetterSetter(memberName)){
+						//Make field public
+					}
+
+					if(((MethodDeclaration) member).getName().startsWith("get") || ((MethodDeclaration) member).getName().startsWith("set")){
+						//Make Filed public
+					}
+				}
+			}
+		}
+	}
+
+	private Boolean isGetterSetter(String str){
+		if(str.startsWith("get") || str.startsWith("set"))
+			return true;
+		else
+			return false;
+
+	}
 
 	private Boolean isPublic(String str){
 		if(str.startsWith("public"))
