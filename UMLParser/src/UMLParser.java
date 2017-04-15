@@ -55,7 +55,8 @@ public class UMLParser {
 	String method_grammar="";
 	ClassOrInterfaceDeclaration classorinterface;
 	List<String> publicFields = new ArrayList<String>();
-	boolean isMore = false;
+	boolean isMore;
+	boolean isFields;
 	
 	public String parseFile(String fileLocation, String destination_URL) throws Exception{
 		
@@ -74,6 +75,7 @@ public class UMLParser {
 			List<TypeDeclaration> listtypedec = file.getTypes();
 			Node node = listtypedec.get(0);
 
+
 			classorinterface = (ClassOrInterfaceDeclaration) node;
 			if (classorinterface.isInterface()) {
 				classOrInterfaceGrammar = "[" + "<<interface>>;";
@@ -85,7 +87,8 @@ public class UMLParser {
 
 			//Parsing Methods,Constructors
 			checkConstructor(node);
-			//checkMethods(node);
+			checkMethods(node);
+			checkFields(node);
 
 		}
 		System.out.println("grammar:" + heading);
@@ -94,6 +97,7 @@ public class UMLParser {
 
 
 	private void checkConstructor(Node node){
+		isMore =false;
 		List<BodyDeclaration> members = ((TypeDeclaration) node).getMembers();
 		for (BodyDeclaration member : members) {
 			//Checking if its constructor
@@ -140,7 +144,8 @@ public class UMLParser {
 	private void checkMethods(Node node){
 
 		// check if its method
-		for(BodyDeclaration member : ((ClassOrInterfaceDeclaration) node).getMembers()){
+		List<BodyDeclaration> members = ((TypeDeclaration) node).getMembers();
+		for(BodyDeclaration member : members){
 			if(member instanceof  MethodDeclaration){
 				MethodDeclaration member_method = (MethodDeclaration)member;
 				String memberAsString = ((MethodDeclaration) member).getDeclarationAsString();
@@ -193,6 +198,21 @@ public class UMLParser {
 				}
 			}
 		}
+	}
+
+	private void checkFields(Node node){
+		isFields =false;
+		List<BodyDeclaration> members = ((TypeDeclaration) node).getMembers();
+		for(BodyDeclaration member : members){
+			if(member instanceof FieldDeclaration){
+				FieldDeclaration field_declaration = (FieldDeclaration)member;
+
+				String field_modifier = "";
+			}
+		}
+
+
+
 	}
 
 
