@@ -90,7 +90,9 @@ public class UMLParser {
 
 					ConstructorDeclaration member_constructor = ((ConstructorDeclaration) member);
 					System.out.println("Constructor: " + member_constructor);
-					if (!classorinterface.isInterface() && ((ConstructorDeclaration) member).getDeclarationAsString().startsWith("public")) {
+					String memberAsString = ((ConstructorDeclaration) member).getDeclarationAsString();
+
+					if (!classorinterface.isInterface() && isPublic(memberAsString)) {
 						System.out.println("Found Public Constructor");
 						method_grammar += ";";
 						method_grammar += "+ " + member_constructor.getName() + "(";
@@ -130,7 +132,15 @@ public class UMLParser {
 		System.out.println("grammar:" + heading);
 		return heading;
 	}
-	
+
+
+	private Boolean isPublic(String str){
+		if(str.startsWith("public"))
+			return true;
+		else
+			return false;
+	}
+
     private void findClassorInterface(List<CompilationUnit> java_files) {
     	
     	set_interfaces = new HashSet<>();
