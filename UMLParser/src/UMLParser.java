@@ -53,7 +53,7 @@ public class UMLParser {
 	String classOrInterfaceName="";
 	String method_grammar="";
 	ClassOrInterfaceDeclaration classorinterface;
-
+	List<String> publicFields = new ArrayList<String>();
 	
 	public String parseFile(String fileLocation, String destination_URL) throws Exception{
 		
@@ -139,15 +139,17 @@ public class UMLParser {
 
 					if(isGetterSetter(memberName)){
 						//Make field public
+						publicFields.add(memberName.substring(3).toLowerCase());
+					}else{
+						
 					}
 
-					if(((MethodDeclaration) member).getName().startsWith("get") || ((MethodDeclaration) member).getName().startsWith("set")){
-						//Make Filed public
-					}
+
 				}
 			}
 		}
 	}
+
 
 	private Boolean isGetterSetter(String str){
 		if(str.startsWith("get") || str.startsWith("set"))
