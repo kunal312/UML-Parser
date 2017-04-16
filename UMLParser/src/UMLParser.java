@@ -206,8 +206,10 @@ public class UMLParser {
 		for(BodyDeclaration member : members){
 			if(member instanceof FieldDeclaration){
 				FieldDeclaration field_declaration = (FieldDeclaration)member;
+				String modifier = member.toStringWithoutComments().substring(0,member.toStringWithoutComments().indexOf(" "));
+				String field_modifier = checkAccessModifier(modifier);
 
-				String field_modifier = "";
+
 			}
 		}
 
@@ -215,6 +217,14 @@ public class UMLParser {
 
 	}
 
+	private String checkAccessModifier(String str){
+		if(str.equals("private")){
+			return "-";
+		}else if(str.equals("public")){
+			return "+";
+		}else
+			return "";
+	}
 
 	private Boolean isGetterSetter(String str){
 		if(str.startsWith("get") || str.startsWith("set"))
