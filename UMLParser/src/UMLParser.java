@@ -207,7 +207,18 @@ public class UMLParser {
 			if(member instanceof FieldDeclaration){
 				FieldDeclaration field_declaration = (FieldDeclaration)member;
 				String modifier = member.toStringWithoutComments().substring(0,member.toStringWithoutComments().indexOf(" "));
-				String field_modifier = checkAccessModifier(modifier);
+				String fieldModifier = checkAccessModifier(modifier);
+				String fieldType =  checkClasses(field_declaration.getType().toString());
+				String p_name = field_declaration.getChildrenNodes().get(1).toString();
+				String fieldName = p_name;
+				if(p_name.contains("="))
+					fieldName= p_name.substring(1,p_name.indexOf("=")-1);
+
+				//If getter setters are present change the scope
+				if(fieldModifier.equals("-") && publicFields.contains(fieldName.toLowerCase()))
+					fieldModifier = "+";
+
+				String checkDependencies="";
 
 
 			}
@@ -215,6 +226,14 @@ public class UMLParser {
 
 
 
+	}
+
+	private String checkClasses(String str){
+		str = str.replace("[", "(");
+		str = str.replace("]", ")");
+		str = str.replace("<", "(");
+		str = str.replace(">", ")");
+		return str;
 	}
 
 	private String checkAccessModifier(String str){
