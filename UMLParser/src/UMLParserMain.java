@@ -16,8 +16,6 @@ public class UMLParserMain {
 		//calling parse file with proper arguments
 		UMLParser parser = new UMLParser();
 		String grammar = parser.parseFile(fileLocation,destination_URL);
-		
-		
 		//Testing UML Class diagram generator with stubbed data.After completion of parsing file logic send grammar as an arguments to below function.
 		MakeUML mu = new MakeUML();
 		String parseString = "[Customer|-forname:string;surname:string|doShiz()]<>-orders*>[Order], [Order]++-0..*>[LineItem], [Order]-[note:Aggregate root{bg:wheat}]";

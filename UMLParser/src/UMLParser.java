@@ -35,7 +35,7 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.JavaParser;
-
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
 
 
 
@@ -47,8 +47,8 @@ public class UMLParser {
 	List<CompilationUnit> java_files;
 	HashSet<String> set_classes;
 	HashSet<String> set_interfaces;
+    HashMap<String, String> mapConnections;
 	String yUML_grammar ="";
-	String heading = "";
 	String append = ",";
 	String classOrInterfaceGrammar="";
 	String classOrInterfaceName="";
@@ -57,26 +57,58 @@ public class UMLParser {
 	List<String> publicFields = new ArrayList<String>();
 	boolean isMore;
 	boolean isFields;
+    String fields = "";
+
 	
 	public String parseFile(String fileLocation, String destination_URL) throws Exception{
-		
+
+	    mapConnections = new HashMap<>();
 		this.fileLocation = fileLocation;
 		this.destination_URL = destination_URL;
 		getAllFilesWithJava(fileLocation);
 		findClassorInterface(java_files);
 		String completeGrammar = createGrammar(java_files);
-		return completeGrammar;
-	}
-	
+        completeGrammar += adddOns();
+        completeGrammar += convertGrammar(completeGrammar);
+        System.out.println("Complete grammar");
+        System.out.println(completeGrammar);
+        return completeGrammar;
+
+    }
+
+    private String convertGrammar(String gramm) {
+        String[] lines = gramm.split(",");
+        String[] unique_lines = new LinkedHashSet<String>(
+                Arrays.asList(lines)).toArray(new String[0]);
+        String res = String.join(",", unique_lines);
+        return res;
+    }
+
+	private String adddOns(){
+        String gramm = "";
+        Set<String> keys = mapConnections.keySet(); // get all keys
+        for (String i : keys) {
+            String[] classes = i.split("-");
+            if (set_interfaces.contains(classes[0]))
+                gramm += "[<<interface>>;" + classes[0] + "]";
+            else
+                gramm += "[" + classes[0] + "]";
+            gramm += mapConnections.get(i); // Add connection
+            if (set_interfaces.contains(classes[1]))
+                gramm += "[<<interface>>;" + classes[1] + "]";
+            else
+                gramm += "[" + classes[1] + "]";
+            gramm += ",";
+        }
+        return gramm;
+    }
 
 	private String createGrammar(List<CompilationUnit> java_files) {
 
 		for (CompilationUnit file : java_files) {
 			List<TypeDeclaration> listtypedec = file.getTypes();
 			Node node = listtypedec.get(0);
-
-
-			classorinterface = (ClassOrInterfaceDeclaration) node;
+            classorinterface = (ClassOrInterfaceDeclaration) node;
 			if (classorinterface.isInterface()) {
 				classOrInterfaceGrammar = "[" + "<<interface>>;";
 			} else
@@ -89,11 +121,23 @@ public class UMLParser {
 			checkConstructor(node);
 			checkMethods(node);
 			checkFields(node);
+			checkExtendsOrImplements();
 
-		}
-		System.out.println("grammar:" + heading);
-		return heading;
+            // Combine className, methods and fields
+            yUML_grammar += classOrInterfaceGrammar;
+            if (!fields.isEmpty()) {
+                yUML_grammar += "|" + checkClasses(fields);
+            }
+            if (!method_grammar.isEmpty()) {
+                yUML_grammar += "|" + checkClasses(method_grammar);
+            }
+            yUML_grammar += "]";
+            yUML_grammar += append;
+
+        }
+        return yUML_grammar;
 	}
+
 
 
 	private void checkConstructor(Node node){
@@ -104,25 +148,22 @@ public class UMLParser {
 			if (member instanceof ConstructorDeclaration) {
 
 				ConstructorDeclaration member_constructor = ((ConstructorDeclaration) member);
-				System.out.println("Constructor: " + member_constructor);
+				//System.out.println("Constructor: " + member_constructor);
 				String memberAsString = ((ConstructorDeclaration) member).getDeclarationAsString();
 
 				if (!classorinterface.isInterface() && isPublic(memberAsString)) {
-					System.out.println("Found Public Constructor");
+					//System.out.println("Found Public Constructor");
 					if(isMore)
 					method_grammar += ";";
 					method_grammar += "+ " + member_constructor.getName() + "(";
 					for (Object child_nodes : member_constructor.getChildrenNodes()) {
-						System.out.println("Child_Nodes:" + child_nodes);
+						//System.out.println("Child_Nodes:" + child_nodes);
 						if (child_nodes instanceof Parameter) {
-							System.out.println("Found parameter in constructor");
-							String name = ((Parameter) child_nodes).getChildrenNodes().get(0).toString();
-							System.out.println("Name: "+name);
-							String type = ((Parameter) child_nodes).getType().toString();
-							System.out.println("type: "+type);
-							method_grammar += name + " : " + type;
+                            String name = ((Parameter) child_nodes).getChildrenNodes().get(0).toString();
+                            String type = ((Parameter) child_nodes).getType().toString();
+                            method_grammar += name + " : " + type;
 							if (set_classes.contains(type)) {
-								append += "[" + heading + "] uses -.->";
+								append += "[" + classOrInterfaceName + "] uses -.->";
 								if (set_interfaces.contains(type)) {
 									append += "[<<interface>>;" + type + "]";
 								} else
@@ -134,7 +175,7 @@ public class UMLParser {
 
 					method_grammar += ")";
 					isMore =true;
-					System.out.println("Method_grammar:"+method_grammar);
+					//System.out.println("Method_grammar:"+method_grammar);
 				}
 			}
 		}
@@ -163,7 +204,7 @@ public class UMLParser {
 
 						for(Object child_nodes : member_method.getChildrenNodes()){
 							if (child_nodes instanceof Parameter) {
-								System.out.println("Found parameters in methods");
+								//System.out.println("Found parameters in methods");
 								String name = ((Parameter) child_nodes).getChildrenNodes().get(0).toString();
 								String type = ((Parameter) child_nodes).getType().toString();
 								method_grammar += name + " : "+type;
@@ -200,33 +241,74 @@ public class UMLParser {
 		}
 	}
 
-	private void checkFields(Node node){
-		isFields =false;
-		List<BodyDeclaration> members = ((TypeDeclaration) node).getMembers();
-		for(BodyDeclaration member : members){
-			if(member instanceof FieldDeclaration){
-				FieldDeclaration field_declaration = (FieldDeclaration)member;
-				String modifier = member.toStringWithoutComments().substring(0,member.toStringWithoutComments().indexOf(" "));
-				String fieldModifier = checkAccessModifier(modifier);
-				String fieldType =  checkClasses(field_declaration.getType().toString());
-				String p_name = field_declaration.getChildrenNodes().get(1).toString();
-				String fieldName = p_name;
-				if(p_name.contains("="))
-					fieldName= p_name.substring(1,p_name.indexOf("=")-1);
+	private void checkFields(Node node) {
+        isFields = false;
+        List<BodyDeclaration> members = ((TypeDeclaration) node).getMembers();
+        for (BodyDeclaration member : members) {
+            if (member instanceof FieldDeclaration) {
+                FieldDeclaration field_declaration = (FieldDeclaration) member;
+                String modifier = member.toStringWithoutComments().substring(0, member.toStringWithoutComments().indexOf(" "));
+                String fieldModifier = checkAccessModifier(modifier);
+                String fieldType = checkClasses(field_declaration.getType().toString());
+                String p_name = field_declaration.getChildrenNodes().get(1).toString();
+                String fieldName = p_name;
+                if (p_name.contains("="))
+                    fieldName = p_name.substring(1, p_name.indexOf("=") - 1);
 
-				//If getter setters are present change the scope
-				if(fieldModifier.equals("-") && publicFields.contains(fieldName.toLowerCase()))
-					fieldModifier = "+";
+                //If getter setters are present change the scope
+                if (fieldModifier.equals("-") && publicFields.contains(fieldName.toLowerCase()))
+                    fieldModifier = "+";
 
-				String checkDependencies="";
+                String dependencies = "";
+                boolean multipleDependencies = false;
+                if (fieldType.contains("(")) {
+                    dependencies = fieldType.substring(fieldType.indexOf("(") + 1, fieldType.indexOf(")"));
+                    multipleDependencies = true;
+                } else if (set_classes.contains(fieldType)) {
+                    dependencies = fieldType;
+                }
+                if (dependencies.length() > 0 && set_classes.contains(dependencies)) {
+                    String conn = "-";
+                    if (mapConnections.containsKey(dependencies + "-" + classOrInterfaceName)) {
+                        conn = mapConnections.get(dependencies + "-" + classOrInterfaceName);
+                        if (multipleDependencies) {
+                            conn = "*" + conn;
+                        }
+
+                        mapConnections.put(dependencies + "-" + classOrInterfaceName, conn);
+                    } else {
+                        if (multipleDependencies)
+                            conn = "*" + conn;
+                        mapConnections.put(classOrInterfaceName + "-" + dependencies, conn);
+                    }
+                }
+                if (fieldModifier == "+" || fieldModifier == "-") {
+                    if (isFields)
+                        fields += "; ";
+                    fields += fieldModifier + " " + fieldName + " : " + fieldType;
+                    isFields = true;
 
 
-			}
-		}
+                }
+            }
+        }
+    }
 
-
-
-	}
+    private void checkExtendsOrImplements(){
+	    if(classorinterface.getExtends()!=null){
+            append += "[" + classOrInterfaceName + "] " + "-^ " + classorinterface.getExtends();
+            append += ",";
+        }
+        if(classorinterface.getImplements()!=null){
+            List<ClassOrInterfaceType> listofinterfaces = (List<ClassOrInterfaceType>) classorinterface
+                    .getImplements();
+            for (ClassOrInterfaceType intface : listofinterfaces) {
+                append += "[" + classOrInterfaceName + "] " + "-.-^ " + "["
+                        + "<<interface>>;" + intface + "]";
+                append += ",";
+            }
+        }
+    }
 
 	private String checkClasses(String str){
 		str = str.replace("[", "(");
