@@ -49,15 +49,16 @@ public class UMLParser {
 	HashSet<String> set_interfaces;
     HashMap<String, String> mapConnections;
 	String yUML_grammar ="";
-	String append = ",";
-	String classOrInterfaceGrammar="";
-	String classOrInterfaceName="";
-	String method_grammar="";
+	String append;
+	String classOrInterfaceGrammar;
+	String classOrInterfaceName;
+	String method_grammar;
 	ClassOrInterfaceDeclaration classorinterface;
-	List<String> publicFields = new ArrayList<String>();
+	List<String> publicFields;
 	boolean isMore;
 	boolean isFields;
     String fields;
+
 
 	
 	public String parseFile(String fileLocation, String destination_URL) throws Exception{
@@ -68,11 +69,11 @@ public class UMLParser {
 		getAllFilesWithJava(fileLocation);
 		findClassorInterface(java_files);
 		String completeGrammar = createGrammar(java_files);
-
-		completeGrammar += adddOns();
-        completeGrammar += convertGrammar(completeGrammar);
-        System.out.println("Complete grammar");
         System.out.println(completeGrammar);
+		completeGrammar += adddOns();
+        completeGrammar = convertGrammar(completeGrammar);
+       // System.out.println("Complete grammar");
+       // System.out.println(completeGrammar);
         return completeGrammar;
 
     }
@@ -108,12 +109,12 @@ public class UMLParser {
 
 		for (CompilationUnit file : java_files) {
 
-            yUML_grammar="";
             classOrInterfaceGrammar="";
             classOrInterfaceName="";
             method_grammar="";
             fields="";
-            append="";
+            append=",";
+            publicFields = new ArrayList<String>();
 
 
 		    List<TypeDeclaration> listtypedec = file.getTypes();
@@ -144,7 +145,7 @@ public class UMLParser {
             yUML_grammar += append;
 
         }
-      //  System.out.println("Yuml Grammar: "+ yUML_grammar);
+
         return yUML_grammar;
 
 	}
@@ -168,12 +169,11 @@ public class UMLParser {
 					method_grammar += ";";
 					method_grammar += "+ " + member_constructor.getName() + "(";
 					for (Object child_nodes : member_constructor.getChildrenNodes()) {
-						//System.out.println("Child_Nodes:" + child_nodes);
 						if (child_nodes instanceof Parameter) {
                             String name = ((Parameter) child_nodes).getChildrenNodes().get(0).toString();
                             String type = ((Parameter) child_nodes).getType().toString();
                             method_grammar += name + " : " + type;
-							if (set_classes.contains(type)) {
+							if (set_classes.contains(type) && !set_interfaces.contains(classOrInterfaceName)) {
 								append += "[" + classOrInterfaceName + "] uses -.->";
 								if (set_interfaces.contains(type)) {
 									append += "[<<interface>>;" + type + "]";
@@ -219,33 +219,53 @@ public class UMLParser {
 								String name = ((Parameter) child_nodes).getChildrenNodes().get(0).toString();
 								String type = ((Parameter) child_nodes).getType().toString();
 								method_grammar += name + " : "+type;
-
-								if(set_classes.contains(type) && !set_interfaces.contains(classOrInterfaceName)){
-								append +="[" + classOrInterfaceName + "] uses -.->";
-									if(set_interfaces.contains(type))
-									append += "[<<interface>>;" + type + "]";
-									else
-										append += "[" +type+ "]";
+                                System.out.println("Inside paramter");
+                                System.out.println("type: "+type);
+                                System.out.println("class or intname:"+classOrInterfaceName);
+                                System.out.println("Set classes type: "+set_classes.contains(type));
+                                System.out.println("Set interfaces not name: "+!set_interfaces.contains(classOrInterfaceName));
+                                if(set_interfaces.contains(type) && !set_interfaces.contains(classOrInterfaceName)) {
+                                    System.out.println("Inside set classes and not set interfaces");
+                                    append += "[" + classOrInterfaceName + "] uses -.-> [<<interface>>;" + type + "]";
+                                    System.out.println("Inside set classes and not set interfaces append" + append);
+                                }else if(set_classes.contains(type) && set_classes.contains(classOrInterfaceName)) {
+                                    //if(set_classes.contains(type) && !set_interfaces.contains(classOrInterfaceName)){
+                                    //else if(set_classes.contains(type) && set_classes.contains(classOrInterfaceName)){
+                                    //if(set_interfaces.contains(type))
+									//append += "[<<interface>>;" + type + "]";
+									//else
+                                    append += "[" + classOrInterfaceName + "] uses -.-> [" + type + "]";
+                                    System.out.println("Inside else set classes and not set interfaces append" + append);
 
 								}
 								append+=",";
 							}else{
-								String methods [] = child_nodes.toString().split(" ");
-								for(String method: methods){
-									if(set_classes.contains(method) && !set_interfaces.contains(classOrInterfaceName)){
-										append += "[" + classOrInterfaceName + "] uses -.->";
-										if(set_interfaces.contains(method))
-											append += "[<<interface>>;" + method + "]";
-										else
-											append += "[" +method+ "]";
-											append+=",";
-									}
+								String methods1 [] = child_nodes.toString().split(" ");
+								for(String meth: methods1){
+
+                                    if(set_interfaces.contains(meth) && !set_interfaces.contains(classOrInterfaceName)) {
+                                        System.out.println("Inside set classes and not set array");
+                                        append += "[" + classOrInterfaceName + "] uses -.-> [<<interface>>;" + meth + "]";
+                                        System.out.println("Inside set classes and not set interfaces append array" + append);
+                                    }
+                                    else if(set_classes.contains(meth) && set_classes.contains(classOrInterfaceName)){
+                                        append += "[" + classOrInterfaceName + "] uses -.-> [" + meth + "]";
+                                        System.out.println("Inside set classes and not set interfaces append else array" + append);
+                                    }
+
+//									if(set_interfaces.contains(meth) && !set_interfaces.contains(classOrInterfaceName)){
+//										append += "[" + classOrInterfaceName + "] uses -.->";
+//										if(set_interfaces.contains(meth))
+//											append += "[<<interface>>;" + meth + "]";
+//										else
+//											append += "[" +meth+ "]";
+//											append+=",";
+//									}
 								}
 							}
 
 						}
 						method_grammar+= ") : "+member_method.getType();
-                        System.out.println("Methods: Method_grammar:"+method_grammar);
 						isMore=true;
 					}
 				}
@@ -290,7 +310,7 @@ public class UMLParser {
                         mapConnections.put(dependencies + "-" + classOrInterfaceName, conn);
                     } else {
                         if (multipleDependencies)
-                            conn = "*" + conn;
+                            conn += "*";
                         mapConnections.put(classOrInterfaceName + "-" + dependencies, conn);
                     }
                 }
@@ -302,7 +322,7 @@ public class UMLParser {
                     isFields = true;
                     //System.out.println("Fields: fields:"+fields);
                 }
-                System.out.println("Fields: fields:"+fields);
+               // System.out.println("Fields: fields:"+fields);
             }
         }
     }
