@@ -173,13 +173,28 @@ public class UMLParser {
                             String name = ((Parameter) child_nodes).getChildrenNodes().get(0).toString();
                             String type = ((Parameter) child_nodes).getType().toString();
                             method_grammar += name + " : " + type;
-							if (set_classes.contains(type) && !set_interfaces.contains(classOrInterfaceName)) {
-								append += "[" + classOrInterfaceName + "] uses -.->";
-								if (set_interfaces.contains(type)) {
-									append += "[<<interface>>;" + type + "]";
-								} else
-									append += "[" + type + "]";
-							}
+                            if(set_interfaces.contains(type) && !set_interfaces.contains(classOrInterfaceName)) {
+                                System.out.println("Inside set classes and not set interfaces");
+                                append += "[" + classOrInterfaceName + "] uses -.-> [<<interface>>;" + type + "]";
+                                System.out.println("Inside set classes and not set interfaces append" + append);
+                            }else if(set_classes.contains(type) && set_classes.contains(classOrInterfaceName)) {
+                                //if(set_classes.contains(type) && !set_interfaces.contains(classOrInterfaceName)){
+                                //else if(set_classes.contains(type) && set_classes.contains(classOrInterfaceName)){
+                                //if(set_interfaces.contains(type))
+                                //append += "[<<interface>>;" + type + "]";
+                                //else
+                                append += "[" + classOrInterfaceName + "] uses -.-> [" + type + "]";
+                                System.out.println("Inside else set classes and not set interfaces append" + append);
+
+                            }
+
+//							if (set_classes.contains(type) && !set_interfaces.contains(classOrInterfaceName)) {
+//								append += "[" + classOrInterfaceName + "] uses -.->";
+//								if (set_interfaces.contains(type)) {
+//									append += "[<<interface>>;" + type + "]";
+//								} else
+//									append += "[" + type + "]";
+//							}
 							append += ",";
 						}
 					}
@@ -252,6 +267,7 @@ public class UMLParser {
                                         append += "[" + classOrInterfaceName + "] uses -.-> [" + meth + "]";
                                         System.out.println("Inside set classes and not set interfaces append else array" + append);
                                     }
+                                    append+=",";
 
 //									if(set_interfaces.contains(meth) && !set_interfaces.contains(classOrInterfaceName)){
 //										append += "[" + classOrInterfaceName + "] uses -.->";
@@ -296,21 +312,28 @@ public class UMLParser {
                 if (fieldType.contains("(")) {
                     dependencies = fieldType.substring(fieldType.indexOf("(") + 1, fieldType.indexOf(")"));
                     multipleDependencies = true;
-                } else if (set_classes.contains(fieldType)) {
+                    System.out.println("multi true");
+                } else if (set_classes.contains(fieldType) || set_interfaces.contains(fieldType)) {
+                    System.out.println("here in doubt condition");
+                    System.out.println("fuled class:"+fieldType);
                     dependencies = fieldType;
                 }
-                if (dependencies.length() > 0 && set_classes.contains(dependencies)) {
+                System.out.println("getdeppen: "+dependencies +" class value: "+set_classes.contains(dependencies)+"interface valu: "+set_interfaces.contains(dependencies));
+                if (dependencies.length() > 0 && (set_classes.contains(dependencies) || set_interfaces.contains(dependencies))) {
                     String conn = "-";
                     if (mapConnections.containsKey(dependencies + "-" + classOrInterfaceName)) {
                         conn = mapConnections.get(dependencies + "-" + classOrInterfaceName);
                         if (multipleDependencies) {
                             conn = "*" + conn;
                         }
+                        System.out.println("depend0: "+dependencies + "-" + classOrInterfaceName + "conn"+conn);
 
                         mapConnections.put(dependencies + "-" + classOrInterfaceName, conn);
                     } else {
                         if (multipleDependencies)
                             conn += "*";
+                        System.out.println("depend: "+classOrInterfaceName + "-" + dependencies + "conn"+conn);
+
                         mapConnections.put(classOrInterfaceName + "-" + dependencies, conn);
                     }
                 }
@@ -322,7 +345,7 @@ public class UMLParser {
                     isFields = true;
                     //System.out.println("Fields: fields:"+fields);
                 }
-               // System.out.println("Fields: fields:"+fields);
+                System.out.println("Fields: fields:"+fields);
             }
         }
     }
