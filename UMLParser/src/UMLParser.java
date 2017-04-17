@@ -57,7 +57,7 @@ public class UMLParser {
 	List<String> publicFields = new ArrayList<String>();
 	boolean isMore;
 	boolean isFields;
-    String fields = "";
+    String fields;
 
 	
 	public String parseFile(String fileLocation, String destination_URL) throws Exception{
@@ -68,7 +68,8 @@ public class UMLParser {
 		getAllFilesWithJava(fileLocation);
 		findClassorInterface(java_files);
 		String completeGrammar = createGrammar(java_files);
-        completeGrammar += adddOns();
+
+		completeGrammar += adddOns();
         completeGrammar += convertGrammar(completeGrammar);
         System.out.println("Complete grammar");
         System.out.println(completeGrammar);
@@ -106,7 +107,16 @@ public class UMLParser {
 	private String createGrammar(List<CompilationUnit> java_files) {
 
 		for (CompilationUnit file : java_files) {
-			List<TypeDeclaration> listtypedec = file.getTypes();
+
+            yUML_grammar="";
+            classOrInterfaceGrammar="";
+            classOrInterfaceName="";
+            method_grammar="";
+            fields="";
+            append="";
+
+
+		    List<TypeDeclaration> listtypedec = file.getTypes();
 			Node node = listtypedec.get(0);
             classorinterface = (ClassOrInterfaceDeclaration) node;
 			if (classorinterface.isInterface()) {
@@ -123,7 +133,6 @@ public class UMLParser {
 			checkFields(node);
 			checkExtendsOrImplements();
 
-            // Combine className, methods and fields
             yUML_grammar += classOrInterfaceGrammar;
             if (!fields.isEmpty()) {
                 yUML_grammar += "|" + checkClasses(fields);
@@ -135,7 +144,9 @@ public class UMLParser {
             yUML_grammar += append;
 
         }
+      //  System.out.println("Yuml Grammar: "+ yUML_grammar);
         return yUML_grammar;
+
 	}
 
 
@@ -175,7 +186,7 @@ public class UMLParser {
 
 					method_grammar += ")";
 					isMore =true;
-					//System.out.println("Method_grammar:"+method_grammar);
+					System.out.println("Method_grammar:"+method_grammar);
 				}
 			}
 		}
@@ -234,6 +245,7 @@ public class UMLParser {
 
 						}
 						method_grammar+= ") : "+member_method.getType();
+                        System.out.println("Methods: Method_grammar:"+method_grammar);
 						isMore=true;
 					}
 				}
@@ -253,7 +265,7 @@ public class UMLParser {
                 String p_name = field_declaration.getChildrenNodes().get(1).toString();
                 String fieldName = p_name;
                 if (p_name.contains("="))
-                    fieldName = p_name.substring(1, p_name.indexOf("=") - 1);
+                    fieldName = p_name.substring(0, p_name.indexOf("=") - 1);
 
                 //If getter setters are present change the scope
                 if (fieldModifier.equals("-") && publicFields.contains(fieldName.toLowerCase()))
@@ -285,11 +297,12 @@ public class UMLParser {
                 if (fieldModifier == "+" || fieldModifier == "-") {
                     if (isFields)
                         fields += "; ";
+
                     fields += fieldModifier + " " + fieldName + " : " + fieldType;
                     isFields = true;
-
-
+                    //System.out.println("Fields: fields:"+fields);
                 }
+                System.out.println("Fields: fields:"+fields);
             }
         }
     }

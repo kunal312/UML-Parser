@@ -19,8 +19,8 @@ public class UMLParserMain {
 		//Testing UML Class diagram generator with stubbed data.After completion of parsing file logic send grammar as an arguments to below function.
 		MakeUML mu = new MakeUML();
 		String parseString = "[Customer|-forname:string;surname:string|doShiz()]<>-orders*>[Order], [Order]++-0..*>[LineItem], [Order]-[note:Aggregate root{bg:wheat}]";
-		String dst_Path = "test_diagram.jpg";
-		mu.makeUML(parseString, dst_Path);
+		//String dst_Path = "test_diagram123.jpg";
+		mu.makeUML(grammar, destination_URL);
 		
 		
 	}
