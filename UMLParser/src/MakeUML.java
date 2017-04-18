@@ -25,7 +25,6 @@ public class MakeUML {
 		    	//Reading and Saving jpg file to destination path
 				InputStream inputStream = connection.getInputStream();
 				FileOutputStream outputStream = new FileOutputStream(new File(dst_Path));
-				//OutputStream op = new FileOutputStream(new File(dst_Path));
 				int read_bytes=-1;
 				byte[] buffer = new byte[BUFFER_SIZE];
 				while((read_bytes=inputStream.read(buffer))!=-1){
@@ -34,7 +33,7 @@ public class MakeUML {
 				
 				outputStream.close();
 				inputStream.close();
-				System.out.println("Class diargam generated");
+				System.out.println("Class diargam generated. Location: "+dst_Path);
 		    }		    	
 		}catch(Exception e){
 			e.printStackTrace();

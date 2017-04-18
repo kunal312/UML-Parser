@@ -7,19 +7,19 @@ public class UMLParserMain {
 	public static void main(String[] args) throws Exception{
 		
 		fileLocation = args[0];
-		destination_URL = args[1];
+		destination_URL = fileLocation+"/"+args[1]+".png";
+
 		
-	//	System.out.println("Command 1 Java File Location: "+fileLocation);
+
+
+		//	System.out.println("Command 1 Java File Location: "+fileLocation);
 	//	System.out.println("Command 2 Dest UrL: "+destination_URL);
 		
 
 		//calling parse file with proper arguments
 		UMLParser parser = new UMLParser();
 		String grammar = parser.parseFile(fileLocation,destination_URL);
-		//Testing UML Class diagram generator with stubbed data.After completion of parsing file logic send grammar as an arguments to below function.
 		MakeUML mu = new MakeUML();
-		String parseString = "[Customer|-forname:string;surname:string|doShiz()]<>-orders*>[Order], [Order]++-0..*>[LineItem], [Order]-[note:Aggregate root{bg:wheat}]";
-		//String dst_Path = "test_diagram123.jpg";
 		mu.makeUML(grammar, destination_URL);
 		
 		
