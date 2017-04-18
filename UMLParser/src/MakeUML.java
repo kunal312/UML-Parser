@@ -33,7 +33,7 @@ public class MakeUML {
 				
 				outputStream.close();
 				inputStream.close();
-				System.out.println("Class diargam generated. Location: "+dst_Path);
+				System.out.println("Class diargam generated\n Location: "+dst_Path);
 		    }		    	
 		}catch(Exception e){
 			e.printStackTrace();

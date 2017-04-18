@@ -9,16 +9,12 @@ public class UMLParserMain {
 		fileLocation = args[0];
 		destination_URL = fileLocation+"/"+args[1]+".png";
 
-		
-
-
-		//	System.out.println("Command 1 Java File Location: "+fileLocation);
-	//	System.out.println("Command 2 Dest UrL: "+destination_URL);
-		
-
+		System.out.println("Command 1 Java Files Location: "+fileLocation);
+		System.out.println("Command 2 Dest UrL: "+destination_URL);
 		//calling parse file with proper arguments
 		UMLParser parser = new UMLParser();
 		String grammar = parser.parseFile(fileLocation,destination_URL);
+		System.out.println("Final Grammar : "+grammar);
 		MakeUML mu = new MakeUML();
 		mu.makeUML(grammar, destination_URL);
 		

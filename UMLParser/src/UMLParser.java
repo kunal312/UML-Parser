@@ -69,7 +69,6 @@ public class UMLParser {
 		getAllFilesWithJava(fileLocation);
 		findClassorInterface(java_files);
 		String completeGrammar = createGrammar(java_files);
-        System.out.println(completeGrammar);
 		completeGrammar += adddOns();
         completeGrammar = convertGrammar(completeGrammar);
         return completeGrammar;
@@ -178,7 +177,7 @@ public class UMLParser {
 
 					method_grammar += ")";
 					isMore =true;
-					System.out.println("Method_grammar:"+method_grammar);
+					//System.out.println("Method_grammar:"+method_grammar);
 				}
 			}
 		}
@@ -213,11 +212,6 @@ public class UMLParser {
 								String name = ((Parameter) child_nodes).getChildrenNodes().get(0).toString();
 								String type = ((Parameter) child_nodes).getType().toString();
 								method_grammar += name + " : "+type;
-                                System.out.println("Inside paramter");
-                                System.out.println("type: "+type);
-                                System.out.println("class or intname:"+classOrInterfaceName);
-                                System.out.println("Set classes type: "+set_classes.contains(type));
-                                System.out.println("Set interfaces not name: "+!set_interfaces.contains(classOrInterfaceName));
                                 setDependencies(type,name);
 								append+=",";
 							}else{
@@ -235,15 +229,6 @@ public class UMLParser {
                                     }
                                     append+=",";
 
-
-//									if(set_interfaces.contains(meth) && !set_interfaces.contains(classOrInterfaceName)){
-//										append += "[" + classOrInterfaceName + "] uses -.->";
-//										if(set_interfaces.contains(meth))
-//											append += "[<<interface>>;" + meth + "]";
-//										else
-//											append += "[" +meth+ "]";
-//											append+=",";
-//									}
 								}
 							}
 
@@ -279,13 +264,10 @@ public class UMLParser {
                 if (fieldType.contains("(")) {
                     dependencies = fieldType.substring(fieldType.indexOf("(") + 1, fieldType.indexOf(")"));
                     multipleDependencies = true;
-                    System.out.println("multi true");
                 } else if (set_classes.contains(fieldType) || set_interfaces.contains(fieldType)) {
-                    System.out.println("here in doubt condition");
-                    System.out.println("fuled class:"+fieldType);
+
                     dependencies = fieldType;
                 }
-                System.out.println("getdeppen: "+dependencies +" class value: "+set_classes.contains(dependencies)+"interface valu: "+set_interfaces.contains(dependencies));
                 if (dependencies.length() > 0 && (set_classes.contains(dependencies) || set_interfaces.contains(dependencies))) {
                     String conn = "-";
                     if (mapConnections.containsKey(dependencies + "-" + classOrInterfaceName)) {
@@ -293,13 +275,11 @@ public class UMLParser {
                         if (multipleDependencies) {
                             conn = "*" + conn;
                         }
-                        System.out.println("depend0: "+dependencies + "-" + classOrInterfaceName + "conn"+conn);
 
                         mapConnections.put(dependencies + "-" + classOrInterfaceName, conn);
                     } else {
                         if (multipleDependencies)
                             conn += "*";
-                        System.out.println("depend: "+classOrInterfaceName + "-" + dependencies + "conn"+conn);
 
                         mapConnections.put(classOrInterfaceName + "-" + dependencies, conn);
                     }
@@ -312,7 +292,6 @@ public class UMLParser {
                     isFields = true;
                     //System.out.println("Fields: fields:"+fields);
                 }
-                System.out.println("Fields: fields:"+fields);
             }
         }
     }
@@ -336,13 +315,10 @@ public class UMLParser {
     private void setDependencies(String type, String name){
 
         if(set_interfaces.contains(type) && !set_interfaces.contains(classOrInterfaceName)) {
-            System.out.println("Inside set classes and not set interfaces");
             append += "[" + classOrInterfaceName + "] uses -.-> [<<interface>>;" + type + "]";
-            System.out.println("Inside set classes and not set interfaces append" + append);
         }else if(set_classes.contains(type) && set_classes.contains(classOrInterfaceName)) {
 
             append += "[" + classOrInterfaceName + "] uses -.-> [" + type + "]";
-            System.out.println("Inside else set classes and not set interfaces append" + append);
 
         }
 
@@ -407,14 +383,11 @@ public class UMLParser {
 		File directory = new File(fileLocation2);
 		for(File file : directory.listFiles()){
 			if(file.isFile() && file.getName().endsWith(".java")){
-				//System.out.println("File " + file.getName());
 	     //Using JavaParser.parse to generate Abstract Syntax Tree (AST) from Java code.AST structure is easy to process which returns CompilationUnit object
 				java_files.add(JavaParser.parse(file));
-			//System.out.println(java_files.get(java_files.size()-1));
 			}
 		
 		}
-		//System.out.println("Total number of files:"+java_files.size());
-	
+
 	}
 }
