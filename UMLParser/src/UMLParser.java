@@ -76,6 +76,7 @@ public class UMLParser {
     }
 
     private String convertGrammar(String gramm) {
+
         String[] lines = gramm.split(",");
         String[] unique_lines = new LinkedHashSet<String>(
                 Arrays.asList(lines)).toArray(new String[0]);
@@ -132,14 +133,17 @@ public class UMLParser {
 			checkExtendsOrImplements();
 
             yUML_grammar += classOrInterfaceGrammar;
+			System.out.println("yuml grambef:"+yUML_grammar);
             if (!fields.isEmpty()) {
-                yUML_grammar += "|" + checkClasses(fields);
+                yUML_grammar += "|" + formatBraces(fields);
             }
             if (!method_grammar.isEmpty()) {
-                yUML_grammar += "|" + checkClasses(method_grammar);
+                yUML_grammar += "|" + formatBraces(method_grammar);
             }
             yUML_grammar += "]";
             yUML_grammar += append;
+
+			System.out.println("yuml gram:"+yUML_grammar);
 
         }
 
@@ -246,10 +250,11 @@ public class UMLParser {
         List<BodyDeclaration> members = ((TypeDeclaration) node).getMembers();
         for (BodyDeclaration member : members) {
             if (member instanceof FieldDeclaration) {
-                FieldDeclaration field_declaration = (FieldDeclaration) member;
+				System.out.println("mn"+member);
+				FieldDeclaration field_declaration = (FieldDeclaration) member;
                 String modifier = member.toStringWithoutComments().substring(0, member.toStringWithoutComments().indexOf(" "));
                 String fieldModifier = checkAccessModifier(modifier);
-                String fieldType = checkClasses(field_declaration.getType().toString());
+                String fieldType = formatBraces(field_declaration.getType().toString());
                 String p_name = field_declaration.getChildrenNodes().get(1).toString();
                 String fieldName = p_name;
                 if (p_name.contains("="))
@@ -261,13 +266,38 @@ public class UMLParser {
 
                 String dependencies = "";
                 boolean multipleDependencies = false;
-                if (fieldType.contains("(")) {
-                    dependencies = fieldType.substring(fieldType.indexOf("(") + 1, fieldType.indexOf(")"));
-                    multipleDependencies = true;
-                } else if (set_classes.contains(fieldType) || set_interfaces.contains(fieldType)) {
 
-                    dependencies = fieldType;
+                //optimized
+                if(fieldType.contains("Collection")){
+					fieldType = fieldType.toString().replace("Collection(","");
+					fieldType = fieldType.replace(")", "");
+					fieldType ="("+fieldType+")";
+					fieldName="";
+					fieldModifier="";
+					System.out.println("Field Type after remo:"+"("+fieldType+")");
+				}
+				//optimized
+
+
+
+
+				if (fieldType.contains("(")) {
+					System.out.println("Field Type:"+fieldType);
+					dependencies = fieldType.substring(fieldType.indexOf("(") + 1, fieldType.indexOf(")"));
+					System.out.println("Deped:"+dependencies);
+					multipleDependencies = true;
                 }
+				else if (set_classes.contains(fieldType) || set_interfaces.contains(fieldType)) {
+					System.out.println("without coll"+fieldType);
+					dependencies = fieldType;
+					//optimized
+					fieldType="";
+					fieldName="";
+					fieldModifier="";
+					//optimized
+
+				}
+
                 if (dependencies.length() > 0 && (set_classes.contains(dependencies) || set_interfaces.contains(dependencies))) {
                     String conn = "-";
                     if (mapConnections.containsKey(dependencies + "-" + classOrInterfaceName)) {
@@ -319,13 +349,13 @@ public class UMLParser {
         }else if(set_classes.contains(type) && set_classes.contains(classOrInterfaceName)) {
 
             append += "[" + classOrInterfaceName + "] uses -.-> [" + type + "]";
-
-        }
+		}
 
     }
 
-	private String checkClasses(String str){
-		str = str.replace("[", "(");
+	private String formatBraces(String str){
+
+    	str = str.replace("[", "(*");//append * for array	//optimized
 		str = str.replace("]", ")");
 		str = str.replace("<", "(");
 		str = str.replace(">", ")");
