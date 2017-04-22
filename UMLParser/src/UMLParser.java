@@ -1,23 +1,21 @@
 import java.util.*;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
+//import java.io.BufferedInputStream;
+//import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.net.URL;
-import java.net.URLConnection;
+//import java.io.FileFilter;
+//import java.io.FileInputStream;
+//import java.io.FileOutputStream;
+//import java.io.IOException;
+//import java.lang.reflect.Constructor;
+//import java.net.URL;
+//import java.net.URLConnection;
 
 import com.github.javaparser.ast.Node;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.omg.CORBA.portable.InputStream;
 
-import com.github.javaparser.*;
+
+
+
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
@@ -27,12 +25,12 @@ import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
-import com.github.javaparser.ast.body.TypeDeclaration;
-import com.github.javaparser.ast.body.VariableDeclarator;
-import com.github.javaparser.ast.type.PrimitiveType;
-import com.github.javaparser.ast.type.ReferenceType;
-import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import com.github.javaparser.ast.body.TypeDeclaration;
+//import com.github.javaparser.ast.body.TypeDeclaration;
+//import com.github.javaparser.ast.body.VariableDeclarator;
+//import com.github.javaparser.ast.type.PrimitiveType;
+//import com.github.javaparser.ast.type.ReferenceType;
+//import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+//import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
@@ -133,7 +131,6 @@ public class UMLParser {
 			checkExtendsOrImplements();
 
             yUML_grammar += classOrInterfaceGrammar;
-			System.out.println("yuml grambef:"+yUML_grammar);
             if (!fields.isEmpty()) {
                 yUML_grammar += "|" + formatBraces(fields);
             }
@@ -143,7 +140,6 @@ public class UMLParser {
             yUML_grammar += "]";
             yUML_grammar += append;
 
-			System.out.println("yuml gram:"+yUML_grammar);
 
         }
 
@@ -223,13 +219,10 @@ public class UMLParser {
 								for(String meth: methods1){
 
                                     if(set_interfaces.contains(meth) && !set_interfaces.contains(classOrInterfaceName)) {
-                                        System.out.println("Inside set classes and not set array");
                                         append += "[" + classOrInterfaceName + "] uses -.-> [<<interface>>;" + meth + "]";
-                                        System.out.println("Inside set classes and not set interfaces append array" + append);
                                     }
                                     else if(set_classes.contains(meth) && set_classes.contains(classOrInterfaceName)){
                                         append += "[" + classOrInterfaceName + "] uses -.-> [" + meth + "]";
-                                        System.out.println("Inside set classes and not set interfaces append else array" + append);
                                     }
                                     append+=",";
 
@@ -250,7 +243,6 @@ public class UMLParser {
         List<BodyDeclaration> members = ((TypeDeclaration) node).getMembers();
         for (BodyDeclaration member : members) {
             if (member instanceof FieldDeclaration) {
-				System.out.println("mn"+member);
 				FieldDeclaration field_declaration = (FieldDeclaration) member;
                 String modifier = member.toStringWithoutComments().substring(0, member.toStringWithoutComments().indexOf(" "));
                 String fieldModifier = checkAccessModifier(modifier);
@@ -274,7 +266,6 @@ public class UMLParser {
 					fieldType ="("+fieldType+")";
 					fieldName="";
 					fieldModifier="";
-					System.out.println("Field Type after remo:"+"("+fieldType+")");
 				}
 				//optimized
 
@@ -288,7 +279,6 @@ public class UMLParser {
 					multipleDependencies = true;
                 }
 				else if (set_classes.contains(fieldType) || set_interfaces.contains(fieldType)) {
-					System.out.println("without coll"+fieldType);
 					dependencies = fieldType;
 					//optimized
 					fieldType="";
