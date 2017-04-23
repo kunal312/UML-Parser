@@ -130,20 +130,29 @@ public class UMLParser {
 			checkFields(node);
 			checkExtendsOrImplements();
 
-            yUML_grammar += classOrInterfaceGrammar;
-            if (!fields.isEmpty()) {
-                yUML_grammar += "|" + formatBraces(fields);
-            }
-            if (!method_grammar.isEmpty()) {
-                yUML_grammar += "|" + formatBraces(method_grammar);
-            }
+			System.out.println("coi gram"+classOrInterfaceGrammar);
+			yUML_grammar += classOrInterfaceGrammar;
+            System.out.println("interface:"+yUML_grammar);
+
+
+
+           if (!fields.isEmpty()) {
+			   System.out.println("fdgf"+yUML_grammar);
+			   yUML_grammar += "|" + formatBraces(fields);
+            	}
+
+
+			if (!method_grammar.isEmpty() && fields.isEmpty()) {
+				yUML_grammar += "|";
+			}
+
+			if(!method_grammar.isEmpty()){
+				yUML_grammar += "|" + formatBraces(method_grammar);
+			}
             yUML_grammar += "]";
             yUML_grammar += append;
-
-
-        }
-
-        return yUML_grammar;
+		}
+		return yUML_grammar;
 
 	}
 
