@@ -1,4 +1,5 @@
 
+
 public class UMLParserMain {
 	
 	private static String fileLocation = null;
@@ -11,11 +12,11 @@ public class UMLParserMain {
 		System.out.println("Command 1 Java Files Location: "+fileLocation);
 		System.out.println("Command 2 Dest UrL: "+destination_URL);
 
-		if(fileLocation.endsWith("sequence")){
-			System.out.println("gotcha!");
-		}
-		else{
+		if(fileLocation.endsWith("sequence")) {
+            System.out.println("not doing!");
+        }
 
+		else{
 			//calling parse to generate class diagram file with proper arguments
 			UMLParser parser = new UMLParser();
 			String grammar = parser.parseFile(fileLocation,destination_URL);
@@ -24,10 +25,6 @@ public class UMLParserMain {
 			mu.makeUML(grammar, destination_URL);
 		}
 
-
-
-		
-		
 	}
 	
 
